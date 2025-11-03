@@ -333,11 +333,8 @@ def <span class="function">transcribir_audio</span>(archivo_audio):
         newCanvas.height = canvas.height + padding * 2;
         const ctx = newCanvas.getContext('2d');
         
-        const gradient = ctx.createLinearGradient(0, 0, newCanvas.width, newCanvas.height);
-        gradient.addColorStop(0, '#ECEFF1');
-        gradient.addColorStop(1, '#CFD8DC');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+        ctx.fillStyle = '#FFFFFF'; // Establece el fondo a blanco sólido
+ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
 
         ctx.drawImage(canvas, padding, padding);
 
