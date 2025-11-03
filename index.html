@@ -145,6 +145,36 @@
       background-color: #3a3a6c;
       transform: scale(1.03);
     }
+    
+    /* --- Notificación Toast --- */
+    #toast-notification {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      padding: 15px 22px;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    
+    #toast-notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    #toast-notification.success {
+      background-color: #28a745; /* Verde */
+    }
+    
+    #toast-notification.error {
+      background-color: #dc3545; /* Rojo */
+    }
 
     /* --- Para impresión / captura --- */
     @media print {
@@ -207,6 +237,33 @@ def transcribir_audio(archivo_audio):
   </div>
 
   <script>
+    // --- NUEVA FUNCIÓN PARA MOSTRAR NOTIFICACIÓN ---
+    function showToast(message, type = 'success') {
+      // Si ya existe una notificación, la elimina para mostrar la nueva
+      const existingToast = document.getElementById('toast-notification');
+      if (existingToast) {
+        existingToast.remove();
+      }
+
+      const toast = document.createElement('div');
+      toast.id = 'toast-notification';
+      toast.className = type; // 'success' o 'error'
+      toast.textContent = message;
+
+      document.body.appendChild(toast);
+
+      // Añade la clase 'show' después de un pequeño retardo para activar la animación
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 10);
+
+      // Oculta y elimina el toast después de 3 segundos
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.addEventListener('transitionend', () => toast.remove());
+      }, 3000);
+    }
+  
     // Función para resaltar sintaxis
     function highlightCode() {
       const codeElement = document.getElementById('code');
@@ -249,11 +306,11 @@ def transcribir_audio(archivo_audio):
         canvas.toBlob(blob => {
           const item = new ClipboardItem({ 'image/png': blob });
           navigator.clipboard.write([item]).then(() => {
-            alert('✅ Captura copiada al portapapeles');
+            showToast('✅ Captura copiada al portapapeles'); // Mensaje de éxito
             button.style.display = 'block';
           }).catch(err => {
             console.error('Error:', err);
-            alert('⚠️ Error al copiar. Verifica permisos del navegador.');
+            showToast('⚠️ Error al copiar. Revisa los permisos.', 'error'); // Mensaje de error
             button.style.display = 'block';
           });
         });
