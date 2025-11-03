@@ -3,178 +3,210 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Explicación de Código - Sistema de Transcripción</title>
+  <title>Generador de Pantallazos de Código</title>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
   <style>
+    /* --- Variables de Diseño --- */
+    :root {
+      --font-ui: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+      
+      --bg-gradient-start: #ECEFF1;
+      --bg-gradient-end: #CFD8DC;
+      
+      --card-bg: #ffffff;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
+      
+      --text-primary: #263238;
+      --text-secondary: #546E7A;
+      
+      /* === PALETA DE COLORES VIBRANTE PARA EL CÓDIGO (¡AJUSTADA!) === */
+      --code-bg: #1e1e1e; /* Fondo negro intenso */
+      --code-header: #252526; /* Cabecera ligeramente más clara */
+      --code-text: #f8f8f2; /* Texto base blanco/gris claro */
+      --code-keyword: #61afef; /* Azul vivo */
+      --code-string: #e6db74; /* Amarillo */
+      --code-comment: #8dc891; /* Verde brillante para comentarios */
+      --code-function: #c678dd; /* Magenta/Púrpura para funciones */
+
+      --accent-color: #5E81AC;
+      --accent-color-hover: #4C6A8D;
+    }
+
     /* --- Diseño Global --- */
     body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f3f4f6;
-      color: #1e1e1e;
+      font-family: var(--font-ui);
+      background-image: linear-gradient(125deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-primary);
       margin: 0;
-      padding: 40px 0;
+      padding: 50px 20px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      gap: 25px;
+      gap: 30px;
       flex-wrap: wrap;
       min-height: 100vh;
+      box-sizing: border-box;
     }
 
     /* --- Contenedor Principal (área de captura) --- */
     .wrapper {
       width: 95%;
       max-width: 880px;
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 35px 40px 25px 40px;
-      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.07);
-      border: 1px solid #e2e5ea;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 45px 50px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #e8eaf6;
+      transition: transform 0.3s ease;
+    }
+    .wrapper:hover {
+        transform: translateY(-5px);
     }
 
     /* --- Panel lateral (fuera del pantallazo) --- */
     .side-panel {
-      width: 300px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.07);
-      border: 1px solid #e2e5ea;
+      width: 320px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #e8eaf6;
       padding: 25px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 20px;
       height: fit-content;
     }
-
     .side-panel h3 {
-      margin: 0;
-      color: #2c3e50;
+      margin: 0 0 10px 0;
+      color: var(--text-primary);
       font-size: 18px;
       font-weight: 600;
       text-align: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
     }
-
     .side-panel label {
       font-size: 14px;
-      color: #555;
-      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: block;
     }
-
     .side-panel textarea {
       width: 100%;
+      box-sizing: border-box;
       height: 80px;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      resize: none;
-      font-family: 'Segoe UI', sans-serif;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #CFD8DC;
+      resize: vertical;
+      font-family: var(--font-ui);
       font-size: 14px;
       transition: all 0.2s ease;
     }
-
     .side-panel textarea:focus {
-      border-color: #4a4a8c;
+      border-color: var(--accent-color);
       outline: none;
-      box-shadow: 0 0 5px rgba(74, 74, 140, 0.3);
+      box-shadow: 0 0 0 3px rgba(94, 129, 172, 0.2);
     }
 
     /* --- Encabezado del pantallazo --- */
     .header {
       text-align: center;
-      font-size: 24px;
-      font-weight: 600;
-      color: #2c3e50;
-      letter-spacing: 0.4px;
-      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
     }
-
     .subheader {
       text-align: center;
-      color: #5c5f63;
-      font-size: 15px;
-      margin-top: -5px;
-      margin-bottom: 25px;
-      font-style: italic;
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 35px;
     }
 
     /* --- Bloque de Código --- */
+    .code-container {
+        background: var(--code-bg);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .code-header {
+        background-color: var(--code-header);
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .code-header .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    .dot.red { background-color: #ED6A5E; }
+    .dot.yellow { background-color: #F4BF4F; }
+    .dot.green { background-color: #61C554; }
+
     .code-block {
-      background-color: #1e1e1e;
-      color: #f8f8f2;
-      padding: 22px 25px;
-      border-radius: 6px;
-      font-family: 'Consolas', 'Courier New', monospace;
+      margin: 0;
+      padding: 25px;
+      color: var(--code-text);
+      font-family: var(--font-code);
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.7;
       white-space: pre-wrap;
       word-wrap: break-word;
       overflow-x: auto;
-      border-left: 5px solid #4a4a8c;
     }
-
-    .keyword {
-      color: #61afef;
-      font-weight: 600;
-    }
-
-    .string {
-      color: #e6db74;
-    }
-
-    .comment {
-      color: #8dc891;
-      font-style: italic;
-    }
+    
+    /* Clases de resaltado */
+    .keyword { color: var(--code-keyword); font-weight: bold; }
+    .string { color: var(--code-string); }
+    .comment { color: var(--code-comment); font-style: italic; }
+    .function { color: var(--code-function); }
 
     /* --- Botón --- */
     .capture-btn {
       display: block;
-      margin: 28px auto 0;
-      padding: 10px 25px;
-      background-color: #4a4a8c;
+      margin: 35px auto 0;
+      padding: 12px 30px;
+      background-color: var(--accent-color);
       color: #fff;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 15px;
-      font-weight: 500;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: var(--font-ui);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(94, 129, 172, 0.3);
+    }
+    .capture-btn:hover {
+      background-color: var(--accent-color-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(94, 129, 172, 0.4);
     }
 
-    .capture-btn:hover {
-      background-color: #3a3a6c;
-      transform: scale(1.03);
-    }
-    
     /* --- Notificación Toast --- */
     #toast-notification {
-      position: fixed;
-      bottom: 25px;
-      right: 25px;
-      padding: 15px 22px;
-      border-radius: 6px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 500;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      z-index: 1000;
-      opacity: 0;
-      transform: translateY(20px);
+      position: fixed; bottom: 25px; right: 25px; padding: 15px 22px;
+      border-radius: 6px; color: #fff; font-size: 15px; font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000;
+      opacity: 0; transform: translateY(20px);
       transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    
-    #toast-notification.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-    #toast-notification.success {
-      background-color: #28a745; /* Verde */
-    }
-    
-    #toast-notification.error {
-      background-color: #dc3545; /* Rojo */
-    }
+    #toast-notification.show { opacity: 1; transform: translateY(0); }
+    #toast-notification.success { background-color: #28a745; }
+    #toast-notification.error { background-color: #dc3545; }
 
     /* --- Para impresión / captura --- */
     @media print {
@@ -192,44 +224,48 @@
       Ejemplo práctico utilizando la librería <b>SpeechRecognition</b>
     </div>
 
-    <pre class="code-block" id="code">
-import speech_recognition as sr  # Importamos la biblioteca para reconocimiento de voz
+    <div class="code-container">
+        <div class="code-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+        </div>
+        <pre class="code-block" id="code">
+import speech_recognition as sr  # Importamos la biblioteca
 
-def transcribir_audio(archivo_audio):
+def <span class="function">transcribir_audio</span>(archivo_audio):
     # Inicializamos el reconocedor
     reconocedor = sr.Recognizer()
     
     # Cargamos el archivo de audio
     with sr.AudioFile(archivo_audio) as fuente:
-        audio = reconocedor.record(fuente)  # Grabamos el audio del archivo
+        audio = reconocedor.record(fuente)
         
     try:
-        # Intentamos transcribir usando Google Web Speech API
+        # Usamos Google Web Speech API
         texto = reconocedor.recognize_google(audio, language='es-ES')
         return texto
     except sr.UnknownValueError:
-        return "No se pudo entender el audio"  # Mensaje de error si no se reconoce
+        return "No se pudo entender el audio"
     except sr.RequestError:
-        return "Error en la solicitud a la API"  # Mensaje si hay problema con la API
+        return "Error en la solicitud a la API"
 </pre>
+    </div>
 
-    <button class="capture-btn" id="capture-btn" onclick="captureScreenshot()">📸 Capturar Pantalla y Copiar</button>
+    <button class="capture-btn" id="capture-btn" onclick="captureScreenshot()">📸 Capturar y Copiar</button>
   </div>
 
-  <!-- Panel lateral (inputs no visibles en la captura) -->
+  <!-- Panel lateral de configuración -->
   <div class="side-panel">
     <h3>Configuración del Pantallazo</h3>
-
     <div>
       <label for="titulo">Título</label>
       <textarea id="titulo" placeholder="Ej: Sistema de Transcripción"></textarea>
     </div>
-
     <div>
       <label for="descripcion">Descripción</label>
-      <textarea id="descripcion" placeholder="Ej: Ejemplo práctico con la librería SpeechRecognition"></textarea>
+      <textarea id="descripcion" placeholder="Ej: Ejemplo práctico con la librería..."></textarea>
     </div>
-
     <div>
       <label for="codigo">Código</label>
       <textarea id="codigo" placeholder="Pega o edita aquí el código a mostrar..."></textarea>
@@ -237,82 +273,85 @@ def transcribir_audio(archivo_audio):
   </div>
 
   <script>
-    // --- NUEVA FUNCIÓN PARA MOSTRAR NOTIFICACIÓN ---
+    // --- Función para mostrar notificación ---
     function showToast(message, type = 'success') {
-      // Si ya existe una notificación, la elimina para mostrar la nueva
       const existingToast = document.getElementById('toast-notification');
-      if (existingToast) {
-        existingToast.remove();
-      }
+      if (existingToast) existingToast.remove();
 
       const toast = document.createElement('div');
       toast.id = 'toast-notification';
-      toast.className = type; // 'success' o 'error'
+      toast.className = type;
       toast.textContent = message;
-
       document.body.appendChild(toast);
 
-      // Añade la clase 'show' después de un pequeño retardo para activar la animación
-      setTimeout(() => {
-        toast.classList.add('show');
-      }, 10);
-
-      // Oculta y elimina el toast después de 3 segundos
+      setTimeout(() => toast.classList.add('show'), 10);
       setTimeout(() => {
         toast.classList.remove('show');
         toast.addEventListener('transitionend', () => toast.remove());
       }, 3000);
     }
   
-    // Función para resaltar sintaxis
+    // --- Función para resaltar sintaxis ---
     function highlightCode() {
       const codeElement = document.getElementById('code');
       let code = codeElement.textContent;
 
-      code = code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+      code = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      // Resaltar nombres de funciones (def mi_funcion(...))
+      code = code.replace(/def\s+([a-zA-Z_]\w*)/g, 'def <span class="function">$1</span>');
 
       // Resaltar strings
       code = code.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>');
-
+      
       // Resaltar palabras clave
-      const keywords = ['import', 'as', 'def', 'return', 'try', 'except', 'with'];
+      const keywords = ['import', 'as', 'def', 'return', 'try', 'except', 'with', 'in', 'is', 'if', 'else', 'elif', 'for', 'while', 'True', 'False', 'None'];
       keywords.forEach(kw => {
-        code = code.replace(
-          new RegExp('\\b' + kw + '\\b', 'g'),
-          '<span class="keyword">' + kw + '</span>'
-        );
+        code = code.replace(new RegExp('\\b' + kw + '\\b', 'g'), '<span class="keyword">' + kw + '</span>');
       });
 
       // Resaltar comentarios
-      code = code.replace(/#(.*)$/gm, '<span class="comment">#$1</span>');
+      code = code.replace(/(#.*)$/gm, '<span class="comment">$1</span>');
 
       codeElement.innerHTML = code;
     }
 
-    // Captura del área principal
+    // --- Función de Captura ---
     function captureScreenshot() {
       const area = document.getElementById('capture-area');
       const button = document.getElementById('capture-btn');
       button.style.display = 'none';
 
       html2canvas(area, {
-        backgroundColor: '#ffffff',
-        scale: 2,
+        backgroundColor: null, 
+        scale: 2.5, 
         useCORS: true
       }).then(canvas => {
-        canvas.toBlob(blob => {
-          const item = new ClipboardItem({ 'image/png': blob });
-          navigator.clipboard.write([item]).then(() => {
-            showToast('✅ Captura copiada al portapapeles'); // Mensaje de éxito
-            button.style.display = 'block';
-          }).catch(err => {
-            console.error('Error:', err);
-            showToast('⚠️ Error al copiar. Revisa los permisos.', 'error'); // Mensaje de error
-            button.style.display = 'block';
-          });
+        const padding = 40;
+        const newCanvas = document.createElement('canvas');
+        newCanvas.width = canvas.width + padding * 2;
+        newCanvas.height = canvas.height + padding * 2;
+        const ctx = newCanvas.getContext('2d');
+        
+        const gradient = ctx.createLinearGradient(0, 0, newCanvas.width, newCanvas.height);
+        gradient.addColorStop(0, '#ECEFF1');
+        gradient.addColorStop(1, '#CFD8DC');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+
+        ctx.drawImage(canvas, padding, padding);
+
+        newCanvas.toBlob(blob => {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+            .then(() => {
+              showToast('✅ Captura copiada al portapapeles');
+              button.style.display = 'block';
+            })
+            .catch(err => {
+              console.error('Error:', err);
+              showToast('⚠️ Error al copiar. Revisa los permisos.', 'error');
+              button.style.display = 'block';
+            });
         });
       });
     }
@@ -323,21 +362,19 @@ def transcribir_audio(archivo_audio):
     const codigoInput = document.getElementById('codigo');
 
     tituloInput.addEventListener('input', () => {
-      const titulo = tituloInput.value.trim() || 'Sin título';
-      document.getElementById('display-titulo').textContent = 'Python - ' + titulo;
+      document.getElementById('display-titulo').textContent = 'Python - ' + (tituloInput.value.trim() || 'Sin título');
     });
 
     descripcionInput.addEventListener('input', () => {
-      const desc = descripcionInput.value.trim() || 'Descripción del ejemplo o librería usada';
-      document.getElementById('display-descripcion').textContent = desc;
+      document.getElementById('display-descripcion').innerHTML = descripcionInput.value.trim() || 'Descripción del ejemplo.';
     });
 
     codigoInput.addEventListener('input', () => {
-      const codeEl = document.getElementById('code');
-      codeEl.textContent = codigoInput.value || '# Escribe o pega tu código aquí';
+      document.getElementById('code').textContent = codigoInput.value || '# Pega tu código aquí...';
       highlightCode();
     });
 
+    // Carga inicial
     window.onload = highlightCode;
   </script>
 </body>
