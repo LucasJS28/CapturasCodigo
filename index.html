@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explicación de Código - Sistema de Transcripción</title>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <style>
+    /* --- Diseño Global --- */
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f3f4f6;
+      color: #1e1e1e;
+      margin: 0;
+      padding: 40px 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 25px;
+      flex-wrap: wrap;
+      min-height: 100vh;
+    }
+
+    /* --- Contenedor Principal (área de captura) --- */
+    .wrapper {
+      width: 95%;
+      max-width: 880px;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 35px 40px 25px 40px;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.07);
+      border: 1px solid #e2e5ea;
+    }
+
+    /* --- Panel lateral (fuera del pantallazo) --- */
+    .side-panel {
+      width: 300px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.07);
+      border: 1px solid #e2e5ea;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      height: fit-content;
+    }
+
+    .side-panel h3 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .side-panel label {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    .side-panel textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: none;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .side-panel textarea:focus {
+      border-color: #4a4a8c;
+      outline: none;
+      box-shadow: 0 0 5px rgba(74, 74, 140, 0.3);
+    }
+
+    /* --- Encabezado del pantallazo --- */
+    .header {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      color: #2c3e50;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+    }
+
+    .subheader {
+      text-align: center;
+      color: #5c5f63;
+      font-size: 15px;
+      margin-top: -5px;
+      margin-bottom: 25px;
+      font-style: italic;
+    }
+
+    /* --- Bloque de Código --- */
+    .code-block {
+      background-color: #1e1e1e;
+      color: #f8f8f2;
+      padding: 22px 25px;
+      border-radius: 6px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+      border-left: 5px solid #4a4a8c;
+    }
+
+    .keyword {
+      color: #61afef;
+      font-weight: 600;
+    }
+
+    .string {
+      color: #e6db74;
+    }
+
+    .comment {
+      color: #8dc891;
+      font-style: italic;
+    }
+
+    /* --- Botón --- */
+    .capture-btn {
+      display: block;
+      margin: 28px auto 0;
+      padding: 10px 25px;
+      background-color: #4a4a8c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .capture-btn:hover {
+      background-color: #3a3a6c;
+      transform: scale(1.03);
+    }
+
+    /* --- Para impresión / captura --- */
+    @media print {
+      .capture-btn, .side-panel {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Área de captura -->
+  <div class="wrapper" id="capture-area">
+    <div class="header" id="display-titulo">Python - Sistema de Transcripción</div>
+    <div class="subheader" id="display-descripcion">
+      Ejemplo práctico utilizando la librería <b>SpeechRecognition</b>
+    </div>
+
+    <pre class="code-block" id="code">
+import speech_recognition as sr  # Importamos la biblioteca para reconocimiento de voz
+
+def transcribir_audio(archivo_audio):
+    # Inicializamos el reconocedor
+    reconocedor = sr.Recognizer()
+    
+    # Cargamos el archivo de audio
+    with sr.AudioFile(archivo_audio) as fuente:
+        audio = reconocedor.record(fuente)  # Grabamos el audio del archivo
+        
+    try:
+        # Intentamos transcribir usando Google Web Speech API
+        texto = reconocedor.recognize_google(audio, language='es-ES')
+        return texto
+    except sr.UnknownValueError:
+        return "No se pudo entender el audio"  # Mensaje de error si no se reconoce
+    except sr.RequestError:
+        return "Error en la solicitud a la API"  # Mensaje si hay problema con la API
+</pre>
+
+    <button class="capture-btn" id="capture-btn" onclick="captureScreenshot()">📸 Capturar Pantalla y Copiar</button>
+  </div>
+
+  <!-- Panel lateral (inputs no visibles en la captura) -->
+  <div class="side-panel">
+    <h3>Configuración del Pantallazo</h3>
+
+    <div>
+      <label for="titulo">Título</label>
+      <textarea id="titulo" placeholder="Ej: Sistema de Transcripción"></textarea>
+    </div>
+
+    <div>
+      <label for="descripcion">Descripción</label>
+      <textarea id="descripcion" placeholder="Ej: Ejemplo práctico con la librería SpeechRecognition"></textarea>
+    </div>
+
+    <div>
+      <label for="codigo">Código</label>
+      <textarea id="codigo" placeholder="Pega o edita aquí el código a mostrar..."></textarea>
+    </div>
+  </div>
+
+  <script>
+    // Función para resaltar sintaxis
+    function highlightCode() {
+      const codeElement = document.getElementById('code');
+      let code = codeElement.textContent;
+
+      code = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Resaltar strings
+      code = code.replace(/(['"`])(.*?)\1/g, '<span class="string">$1$2$1</span>');
+
+      // Resaltar palabras clave
+      const keywords = ['import', 'as', 'def', 'return', 'try', 'except', 'with'];
+      keywords.forEach(kw => {
+        code = code.replace(
+          new RegExp('\\b' + kw + '\\b', 'g'),
+          '<span class="keyword">' + kw + '</span>'
+        );
+      });
+
+      // Resaltar comentarios
+      code = code.replace(/#(.*)$/gm, '<span class="comment">#$1</span>');
+
+      codeElement.innerHTML = code;
+    }
+
+    // Captura del área principal
+    function captureScreenshot() {
+      const area = document.getElementById('capture-area');
+      const button = document.getElementById('capture-btn');
+      button.style.display = 'none';
+
+      html2canvas(area, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true
+      }).then(canvas => {
+        canvas.toBlob(blob => {
+          const item = new ClipboardItem({ 'image/png': blob });
+          navigator.clipboard.write([item]).then(() => {
+            alert('✅ Captura copiada al portapapeles');
+            button.style.display = 'block';
+          }).catch(err => {
+            console.error('Error:', err);
+            alert('⚠️ Error al copiar. Verifica permisos del navegador.');
+            button.style.display = 'block';
+          });
+        });
+      });
+    }
+
+    // --- Sincronización en tiempo real ---
+    const tituloInput = document.getElementById('titulo');
+    const descripcionInput = document.getElementById('descripcion');
+    const codigoInput = document.getElementById('codigo');
+
+    tituloInput.addEventListener('input', () => {
+      const titulo = tituloInput.value.trim() || 'Sin título';
+      document.getElementById('display-titulo').textContent = 'Python - ' + titulo;
+    });
+
+    descripcionInput.addEventListener('input', () => {
+      const desc = descripcionInput.value.trim() || 'Descripción del ejemplo o librería usada';
+      document.getElementById('display-descripcion').textContent = desc;
+    });
+
+    codigoInput.addEventListener('input', () => {
+      const codeEl = document.getElementById('code');
+      codeEl.textContent = codigoInput.value || '# Escribe o pega tu código aquí';
+      highlightCode();
+    });
+
+    window.onload = highlightCode;
+  </script>
+</body>
+</html>
